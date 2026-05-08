@@ -1,0 +1,34 @@
+name: Solana Contracts CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'contracts/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'contracts/**'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Solana CLI
+        uses: metaplex-foundation/setup-solana@v1
+        with:
+          solana-version: '1.18.15' # Aligning with common stable versions
+
+      - name: Build Program
+        working-directory: ./contracts
+        run: cargo build-sbf
+
+      - name: Run Tests
+        working-directory: ./contracts
+        run: cargo test
