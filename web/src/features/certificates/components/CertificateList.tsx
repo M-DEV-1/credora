@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import { m } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -128,14 +129,13 @@ export function CertificateList() {
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="hover:bg-neutral-100 text-neutral-500"
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
+                      <DropdownMenuTrigger
+                        className={cn(
+                          buttonVariants({ variant: "ghost", size: "icon" }),
+                          "hover:bg-neutral-100 text-neutral-500"
+                        )}
+                      >
+                        <MoreVertical className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
