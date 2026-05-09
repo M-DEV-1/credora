@@ -13,7 +13,7 @@ const parsed = publicEnvSchema.safeParse({
 });
 
 if (!parsed.success) {
-  console.error("❌ Invalid Public Environment Variables:", parsed.error.format());
+  console.error("❌ Invalid Public Environment Variables:", z.treeifyError(parsed.error));
   throw new Error("Invalid public environment variables");
 }
 

@@ -20,7 +20,7 @@ const parsed = serverEnvSchema.safeParse({
 });
 
 if (!parsed.success) {
-  console.error("❌ Invalid Server Environment Variables:", parsed.error.format());
+  console.error("❌ Invalid Server Environment Variables:", z.treeifyError(parsed.error));
   throw new Error("Invalid server environment variables");
 }
 
