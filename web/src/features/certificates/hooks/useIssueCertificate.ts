@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useWallets } from "@wallet-standard/react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { solanaClient } from "@/services/solana";
 import { CertificateMetadata } from "../types";
 import { useRouter } from "next/navigation";
@@ -14,21 +14,22 @@ import {
   appendTransactionMessageInstruction,
   address,
   compileTransaction,
-  getTransactionEncoder
+  getTransactionEncoder,
+  type Base64EncodedWireTransaction
 } from "@solana/kit";
 
 export function useIssueCertificate() {
-  const wallets = useWallets();
+  const { publicKey, signMessage, signTransaction, connected } = useWallet();
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const connectedWallet = wallets.find(w => w.accounts.length > 0);
-  const activeAccount = connectedWallet?.accounts[0];
-
   return useMutation({
     mutationFn: async (metadata: CertificateMetadata) => {
-      if (!activeAccount || !connectedWallet) throw new Error("Wallet not connected");
-      const issuerAddress = address(activeAccount.address);
+      if (!publicKey || !connected) throw new Error("Wallet not connected");
+      if (!signMessage) throw new Error("Wallet does not support message signing");
+      if (!signTransaction) throw new Error("Wallet does not support transaction signing");
+
+      const issuerAddress = address(publicKey.toBase58());
 
       toast.info("Signing request with your wallet...");
 
@@ -36,14 +37,8 @@ export function useIssueCertificate() {
       const message = JSON.stringify(metadata);
       const messageBytes = new TextEncoder().encode(message);
 
-      // 2. Sign using Wallet Standard
-      const signFeature = (connectedWallet as any).features['solana:signMessage'];
-      if (!signFeature) throw new Error("Wallet does not support message signing");
-
-      const [{ signature }] = await signFeature.signMessage({
-        account: activeAccount,
-        message: messageBytes,
-      });
+      // 2. Sign using Wallet Adapter
+      const signature = await signMessage(messageBytes);
 
       toast.info("Uploading metadata to IPFS...");
       
@@ -82,20 +77,21 @@ export function useIssueCertificate() {
         (m) => appendTransactionMessageInstruction(instruction, m)
       );
 
-      // 6. Sign and Send using Wallet Standard
-      const feature = (connectedWallet as any).features['solana:signAndSendTransaction'];
-      if (!feature) throw new Error("Wallet does not support signAndSendTransaction");
-
       const transaction = compileTransaction(transactionMessage);
       const serializedTransaction = getTransactionEncoder().encode(transaction);
       
       toast.info("Please sign the transaction in your wallet...");
 
-      const [{ signature: txSignature }] = await feature.signAndSendTransaction({
-        account: activeAccount,
-        chain: 'solana:devnet', 
-        transaction: serializedTransaction,
-      });
+      // 6. Sign using the wallet adapter
+      const { VersionedTransaction } = await import("@solana/web3.js");
+      const versionedTx = VersionedTransaction.deserialize(new Uint8Array(serializedTransaction));
+      const signedTx = await signTransaction(versionedTx);
+
+      // 7. Send the signed transaction via RPC
+      const encodedTx = Buffer.from(signedTx.serialize()).toString('base64') as Base64EncodedWireTransaction;
+      const txSignature = await solanaClient.rpc
+        .sendTransaction(encodedTx, { encoding: 'base64' })
+        .send();
 
       console.log("Transaction sent:", txSignature);
       
