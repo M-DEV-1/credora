@@ -83,8 +83,8 @@ export function IssueCertificateForm() {
       {/* Progress Bar */}
       <div className="relative flex justify-between px-2">
         <div className="absolute top-5 left-0 w-full h-0.5 bg-neutral-200 -translate-y-1/2 z-0" />
-        <div
-          className="absolute top-5 left-0 h-0.5 bg-blue-600 -translate-y-1/2 z-0 transition-all duration-500"
+        <div 
+          className="absolute top-5 left-0 h-0.5 bg-[#002147] -translate-y-1/2 z-0 transition-all duration-500" 
           style={{ width: `${(stepIndex / (steps.length - 1)) * 100}%` }}
         />
         {steps.map((step, idx) => {
@@ -100,9 +100,9 @@ export function IssueCertificateForm() {
                 className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 border-2 bg-white",
                   isCurrent
-                    ? "border-blue-600 text-blue-600 scale-110 shadow-lg shadow-blue-600/10 ring-4 ring-blue-600/5"
+                    ? "border-[#002147] text-[#002147] scale-110 shadow-lg shadow-blue-900/10 ring-4 ring-blue-900/5"
                     : isActive
-                      ? "border-blue-600 text-blue-600"
+                      ? "border-[#002147] text-[#002147]"
                       : "border-neutral-200 text-neutral-300",
                 )}
               >
@@ -274,7 +274,7 @@ export function IssueCertificateForm() {
                     <Button
                       type="button"
                       onClick={onNext}
-                      className="w-full h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md"
+                      className="w-full h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md transition-colors"
                     >
                       Continue to Security{" "}
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -315,7 +315,7 @@ export function IssueCertificateForm() {
                       <Button
                         type="button"
                         onClick={() => setCurrentStep("blockchain")}
-                        className="h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md"
+                        className="h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md transition-colors"
                       >
                         Authorize <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -366,7 +366,7 @@ export function IssueCertificateForm() {
                       <Button
                         type="submit"
                         disabled={isPending}
-                        className="h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md"
+                        className="h-12 font-black uppercase tracking-widest text-xs bg-[#002147] hover:bg-[#003366] text-white rounded-md transition-colors"
                       >
                         {isPending ? (
                           <>

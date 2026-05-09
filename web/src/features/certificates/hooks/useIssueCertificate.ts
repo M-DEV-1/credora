@@ -54,7 +54,8 @@ export function useIssueCertificate() {
       
       if (!ipfsResponse.ok) {
         const errorData = await ipfsResponse.json();
-        throw new Error(errorData.details || errorData.error || "IPFS upload failed");
+        const errorMessage = errorData.error || errorData.details || "IPFS upload failed";
+        throw new Error(`HTTP_${ipfsResponse.status}: ${errorMessage}`);
       }
       
       const { cid, certId } = await ipfsResponse.json();
