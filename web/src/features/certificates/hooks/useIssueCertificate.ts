@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallets } from "@wallet-standard/react";
 import { solanaClient } from "@/services/solana";
 import { CertificateMetadata } from "../types";
 import { useRouter } from "next/navigation";
@@ -14,30 +14,36 @@ import {
   appendTransactionMessageInstruction,
   address,
   compileTransaction,
-  getTransactionEncoder,
-  type Base64EncodedWireTransaction
+  getTransactionEncoder
 } from "@solana/kit";
 
 export function useIssueCertificate() {
-  const { publicKey, signMessage, signTransaction, connected } = useWallet();
+  const wallets = useWallets();
   const queryClient = useQueryClient();
   const router = useRouter();
 
+  const connectedWallet = wallets.find(w => w.accounts.length > 0);
+  const activeAccount = connectedWallet?.accounts[0];
+
   return useMutation({
     mutationFn: async (metadata: CertificateMetadata) => {
-      if (!publicKey || !connected) throw new Error("Wallet not connected");
-      if (!signMessage) throw new Error("Wallet does not support message signing");
-
-      const issuerAddress = address(publicKey.toBase58());
+      if (!activeAccount || !connectedWallet) throw new Error("Wallet not connected");
+      const issuerAddress = address(activeAccount.address);
 
       toast.info("Signing request with your wallet...");
 
       // 1. Prepare data for signing
-      const metadataJson = JSON.stringify(metadata);
-      const messageBytes = new TextEncoder().encode(metadataJson);
+      const message = JSON.stringify(metadata);
+      const messageBytes = new TextEncoder().encode(message);
 
-      // 2. Sign using the wallet adapter
-      const signature = await signMessage(messageBytes);
+      // 2. Sign using Wallet Standard
+      const signFeature = (connectedWallet as any).features['solana:signMessage'];
+      if (!signFeature) throw new Error("Wallet does not support message signing");
+
+      const [{ signature }] = await signFeature.signMessage({
+        account: activeAccount,
+        message: messageBytes,
+      });
 
       toast.info("Uploading metadata to IPFS...");
       
@@ -62,10 +68,10 @@ export function useIssueCertificate() {
 
       toast.info("Preparing Solana transaction...");
 
-      // 4. Derive PDA using certId (hashed CID, ≤32 bytes for PDA seed)
+      // 4. Derive PDA
       const pda = await solanaClient.getCertificateAddress(issuerAddress, certId);
 
-      // 5. Build the transaction (certId is what goes on-chain)
+      // 5. Build the transaction
       const { value: latestBlockhash } = await solanaClient.rpc.getLatestBlockhash().send();
       const instruction = solanaClient.getIssueInstruction(issuerAddress, pda, certId);
 
@@ -76,23 +82,20 @@ export function useIssueCertificate() {
         (m) => appendTransactionMessageInstruction(instruction, m)
       );
 
+      // 6. Sign and Send using Wallet Standard
+      const feature = (connectedWallet as any).features['solana:signAndSendTransaction'];
+      if (!feature) throw new Error("Wallet does not support signAndSendTransaction");
+
       const transaction = compileTransaction(transactionMessage);
       const serializedTransaction = getTransactionEncoder().encode(transaction);
-
+      
       toast.info("Please sign the transaction in your wallet...");
 
-      // 6. Sign and send using the wallet adapter
-      if (!signTransaction) throw new Error("Wallet does not support transaction signing");
-
-      const { VersionedTransaction } = await import("@solana/web3.js");
-      const versionedTx = VersionedTransaction.deserialize(new Uint8Array(serializedTransaction));
-      const signedTx = await signTransaction(versionedTx);
-
-      // Send the signed transaction via RPC
-      const encodedTx = Buffer.from(signedTx.serialize()).toString('base64') as Base64EncodedWireTransaction;
-      const txSignature = await solanaClient.rpc
-        .sendTransaction(encodedTx, { encoding: 'base64' })
-        .send();
+      const [{ signature: txSignature }] = await feature.signAndSendTransaction({
+        account: activeAccount,
+        chain: 'solana:devnet', 
+        transaction: serializedTransaction,
+      });
 
       console.log("Transaction sent:", txSignature);
       
