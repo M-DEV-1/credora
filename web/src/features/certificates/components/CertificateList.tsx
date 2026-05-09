@@ -93,10 +93,8 @@ export function CertificateList() {
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" className="hover:bg-neutral-100 text-neutral-500">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center shrink-0 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-neutral-100 text-neutral-500 h-9 w-9">
+                        <MoreVertical className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-white border-neutral-200 text-neutral-700 shadow-xl rounded-xl">
                         <DropdownMenuItem>
