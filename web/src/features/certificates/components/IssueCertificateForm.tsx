@@ -3,7 +3,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { certificateMetadataSchema, type CertificateMetadata } from "../types";
 import { useIssueCertificate } from "../hooks/useIssueCertificate";
 import { Button } from "@/components/ui/button";
@@ -83,8 +83,8 @@ export function IssueCertificateForm() {
       {/* Progress Bar */}
       <div className="relative flex justify-between px-2">
         <div className="absolute top-5 left-0 w-full h-0.5 bg-neutral-200 -translate-y-1/2 z-0" />
-        <div 
-          className="absolute top-5 left-0 h-0.5 bg-[#002147] -translate-y-1/2 z-0 transition-all duration-500" 
+        <div
+          className="absolute top-5 left-0 h-0.5 bg-[#002147] -translate-y-1/2 z-0 transition-all duration-500"
           style={{ width: `${(stepIndex / (steps.length - 1)) * 100}%` }}
         />
         {steps.map((step, idx) => {
@@ -121,7 +121,7 @@ export function IssueCertificateForm() {
         })}
       </div>
 
-      <motion.div
+      <m.div
         layout
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -146,7 +146,7 @@ export function IssueCertificateForm() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <AnimatePresence mode="wait">
                 {currentStep === "metadata" && (
-                  <motion.div
+                  <m.div
                     key="metadata"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -279,11 +279,11 @@ export function IssueCertificateForm() {
                       Continue to Security{" "}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {currentStep === "security" && (
-                  <motion.div
+                  <m.div
                     key="security"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -320,11 +320,11 @@ export function IssueCertificateForm() {
                         Authorize <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {currentStep === "blockchain" && (
-                  <motion.div
+                  <m.div
                     key="blockchain"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -378,13 +378,13 @@ export function IssueCertificateForm() {
                         )}
                       </Button>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </form>
           </CardContent>
         </Card>
-      </motion.div>
+      </m.div>
     </div>
   );
 }
