@@ -3,8 +3,6 @@ import { Navbar } from "@/components/layouts/Navbar";
 import { DashboardHeader } from "@/features/certificates/components/DashboardHeader";
 import { WalletGuard } from "@/components/WalletGuard";
 
-export const unstable_instant = { prefetch: 'static' };
-
 export default function DashboardPage() {
   return (
     <main className="flex min-h-screen flex-col">

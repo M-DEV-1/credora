@@ -1,5 +1,3 @@
-export const unstable_instant = { prefetch: 'static' };
-
 import { IssueCertificateForm } from "@/features/certificates/components/IssueCertificateForm";
 import { Navbar } from "@/components/layouts/Navbar";
 import { WalletGuard } from "@/components/WalletGuard";
