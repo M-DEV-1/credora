@@ -2,9 +2,11 @@
 
 ![Credora Preview](./public/image.png)
 
-<video src="./public/credora-demo.mp4" controls="controls" muted="muted" width="100%"></video>
+Credora is an institutional platform for issuing, managing, and verifying digital credentials securely on the Solana blockchain. It combines the immutability of decentralized ledgers with off-chain IPFS storage to provide tamper-proof academic and professional records.
 
-Credora is an institutional-grade platform for issuing, managing, and verifying digital credentials securely on the Solana blockchain. It combines the immutability of decentralized ledgers with off-chain IPFS storage to provide tamper-proof academic and professional records.
+## Demo
+
+<video src="./public/credora-demo.mp4" controls="controls" muted="muted" width="100%"></video>
 
 ## Features
 
@@ -16,18 +18,20 @@ Credora is an institutional-grade platform for issuing, managing, and verifying 
 ## Tech Stack
 
 - **Frontend**: Next.js, Tailwind CSS, Framer Motion
-- **Blockchain**: Solana (Native Rust), `@solana/web3.js`, `@solana/kit`
+- **Blockchain**: Solana (Rust), `@solana/web3.js`, `@solana/kit`
 - **Storage**: IPFS (Pinata), MongoDB
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js v18+
 - A Solana Wallet (e.g., Phantom)
 
 ### Local Setup
 
 1. **Clone the repository and navigate to the web directory:**
+
    ```bash
    git clone https://github.com/M-DEV-1/credora.git
    cd credora/web
@@ -36,6 +40,7 @@ Credora is an institutional-grade platform for issuing, managing, and verifying 
 
 2. **Configure environment variables:**
    Copy the example configuration and fill in your Pinata and MongoDB keys:
+
    ```bash
    cp .env.example .env
    ```
