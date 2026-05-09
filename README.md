@@ -5,8 +5,9 @@
 Credora is an institutional platform for issuing, managing, and verifying digital credentials securely on the Solana blockchain. It combines the immutability of decentralized ledgers with off-chain IPFS storage to provide tamper-proof academic and professional records.
 
 ## Demo
+https://github.com/user-attachments/assets/e44f85cd-16bd-41db-950c-64a27035a1a9
 
-<video src="./public/credora-demo.mp4" controls="controls" muted="muted" width="100%"></video>
+
 
 ## Features
 
