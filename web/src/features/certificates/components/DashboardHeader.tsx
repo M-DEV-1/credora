@@ -1,18 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function DashboardHeader() {
   return (
-    <motion.div
+    <m.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 relative z-10"
-    >
-      <div>
+    >      <div>
         <h1 className="text-4xl font-black tracking-tight text-neutral-900">
           Dashboard
         </h1>
@@ -30,6 +29,6 @@ export function DashboardHeader() {
           Issue New
         </Button>
       </Link>
-    </motion.div>
+    </m.div>
   );
 }
