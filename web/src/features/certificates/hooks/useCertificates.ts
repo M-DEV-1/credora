@@ -74,7 +74,7 @@ export function useCertificates() {
             let publicMeta = {};
             const realCid = privateData.ipfsCid || certId;
             try {
-              const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${realCid}`;
+              const ipfsUrl = `/api/ipfs?cid=${realCid}`;
               const metaResponse = await fetch(ipfsUrl);
               if (metaResponse.ok) {
                 publicMeta = await metaResponse.json();

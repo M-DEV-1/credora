@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { serverEnv } from "@/config/env.server";
 import { connection } from "next/server";
 import { ipfsService } from "@/services/ipfs";
 import { certificateMetadataSchema } from "@/features/certificates/types";
@@ -25,7 +26,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { metadata, signature, publicKey } = body;
 
-    // ── 1. Auth: Require signature + publicKey ──────────────────────
     if (!signature || !publicKey) {
       return NextResponse.json({ error: "Missing signature or public key" }, { status: 401 });
     }
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         const rateLimit = await RateLimit.findOne({ walletAddress });
 
         if (rateLimit) {
-          if (rateLimit.count >= 2) {
+          if (rateLimit.count >= 100) {
             return NextResponse.json(
               { error: "Demo limit reached. Maximum 2 requests per 100 hours." },
               { status: 429 }
@@ -78,7 +78,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── 3. Validation ───────────────────────────────────────────────
     const validation = certificateMetadataSchema.safeParse(metadata);
     if (!validation.success) {
       return NextResponse.json(
@@ -103,13 +102,9 @@ export async function POST(req: NextRequest) {
       recipientEmail: fullData.recipientEmail,
     };
 
-    // ── 4. IPFS: Upload public metadata (critical — must succeed) ──
     const { cid, url } = await ipfsService.uploadMetadata(publicMetadata);
 
-    // ── 5. Hash CID for on-chain PDA seed (≤32 bytes) ──────────────
     const certId = hashCidForPda(cid);
-
-    // ── 6. MongoDB: Store encrypted PII + CID mapping (graceful) ───
     if (dbAvailable) {
       try {
         const encrypted = encryptionService.encrypt(JSON.stringify(privateMetadata));
@@ -132,5 +127,33 @@ export async function POST(req: NextRequest) {
       { error: "Failed to process request", details: error?.message || String(error) },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const cid = url.searchParams.get("cid");
+  
+  if (!cid) {
+    return NextResponse.json({ error: "Missing CID parameter" }, { status: 400 });
+  }
+
+  try {
+    let gateway = serverEnv.PINATA_GATEWAY.replace(/\/$/, ""); // Remove trailing slash if any
+    if (!gateway.startsWith("http://") && !gateway.startsWith("https://")) {
+      gateway = `https://${gateway}`;
+    }
+    const ipfsUrl = `${gateway}/ipfs/${cid}`;
+    const response = await fetch(ipfsUrl);
+    
+    if (!response.ok) {
+      return NextResponse.json({ error: "Failed to fetch from IPFS" }, { status: response.status });
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("IPFS Proxy Error:", error);
+    return NextResponse.json({ error: "Failed to fetch from IPFS proxy" }, { status: 500 });
   }
 }

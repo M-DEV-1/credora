@@ -33,17 +33,19 @@ function VerifyContent() {
           return;
         }
 
-        // 2. Fetch IPFS
-        setStep("fetching");
-        const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${onChain.cid}`;
-        const publicMetaResponse = await fetch(ipfsUrl);
-        if (!publicMetaResponse.ok) throw new Error("Failed to fetch public metadata.");
-        const publicMetadata = await publicMetaResponse.json();
-
-        // 3. Decrypt Private
+        // 2. Fetch Database Metadata (to get real IPFS CID)
         setStep("decrypting");
         const privateResponse = await fetch(`/api/certificates/${onChain.cid}`);
         const privateMetadata = privateResponse.ok ? await privateResponse.json() : {};
+        
+        const realCid = privateMetadata.ipfsCid || onChain.cid;
+
+        // 3. Fetch IPFS Public Metadata
+        setStep("fetching");
+        const ipfsUrl = `/api/ipfs?cid=${realCid}`;
+        const publicMetaResponse = await fetch(ipfsUrl);
+        if (!publicMetaResponse.ok) throw new Error("Failed to fetch public metadata.");
+        const publicMetadata = await publicMetaResponse.json();
 
         setCertificate({ 
           onChain, 
@@ -186,7 +188,7 @@ function VerifyContent() {
                 <FileText className="h-3 w-3" /> IPFS CID
               </div>
               <a 
-                href={`https://gateway.pinata.cloud/ipfs/${certificate.onChain.cid}`}
+                href={`https://ipfs.io/ipfs/${certificate.onChain.cid}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary font-mono text-sm hover:underline truncate block"

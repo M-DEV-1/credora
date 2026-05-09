@@ -47,8 +47,8 @@ export async function GET(
 
     // Verify Signature: Only the Issuer can unlock the private data
     try {
-      // The message being signed is just the CID to prevent reuse
-      const messageBytes = new TextEncoder().encode(`View private data for ${cid}`);
+      // The message being signed is a generic session message
+      const messageBytes = new TextEncoder().encode("Authenticate to view certificate PII");
       const signatureBytes = Buffer.from(signature, 'base64');
       const publicKeyBytes = bs58.decode(publicKey);
 
