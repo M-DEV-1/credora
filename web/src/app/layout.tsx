@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import { LazyMotion, domAnimation } from "framer-motion";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -40,10 +41,12 @@ export default function RootLayout({
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-slate-100 blur-[120px] rounded-full opacity-60" />
         </div>
 
-        <Providers>
-          {children}
-          <Toaster richColors position="top-right" />
-        </Providers>
+        <LazyMotion features={domAnimation}>
+          <Providers>
+            {children}
+            <Toaster richColors position="top-right" />
+          </Providers>
+        </LazyMotion>
       </body>
     </html>
   );
