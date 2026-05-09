@@ -10,7 +10,7 @@ import {
   History,
 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 export default function Home() {
   return (
@@ -18,7 +18,7 @@ export default function Home() {
       <Navbar />
 
       <section className="relative flex flex-1 flex-col items-center justify-center px-4 pt-32 pb-20 text-center sm:px-6 lg:px-8 z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -40,7 +40,7 @@ export default function Home() {
             for the modern institution.
           </p>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -64,8 +64,8 @@ export default function Home() {
                 Verify Record
               </Button>
             </Link>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Institutional Features */}
         <div className="mt-32 grid w-full max-w-6xl grid-cols-1 gap-12 sm:grid-cols-3 relative z-10">
@@ -89,7 +89,7 @@ export default function Home() {
               icon: History,
             },
           ].map((feature, i) => (
-            <motion.div
+            <m.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -105,7 +105,7 @@ export default function Home() {
               <p className="text-slate-500 leading-relaxed text-sm font-light">
                 {feature.description}
               </p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
