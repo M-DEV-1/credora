@@ -62,15 +62,25 @@ export class SolanaClient {
    * Fetches and decodes a certificate account
    */
   async getCertificate(addressStr: string): Promise<CertificateData | null> {
-    const addr = address(addressStr);
-    const { value: account } = await this.rpc.getAccountInfo(addr).send();
-    
-    if (!account || !account.data) return null;
-
     try {
-      return certificateAccountCodec.decode(account.data as any);
+      const addr = address(addressStr);
+      const { value: account } = await this.rpc.getAccountInfo(addr, { encoding: 'base64' }).send();
+      
+      if (!account || !account.data) return null;
+
+      let dataBytes: Uint8Array;
+      if (Array.isArray(account.data) && typeof account.data[0] === 'string') {
+        const base64Str = account.data[0];
+        dataBytes = Uint8Array.from(Buffer.from(base64Str, 'base64'));
+      } else if (account.data instanceof Uint8Array) {
+        dataBytes = account.data;
+      } else {
+        throw new Error("Unexpected account data format");
+      }
+
+      return certificateAccountCodec.decode(dataBytes);
     } catch (e) {
-      console.error("Failed to decode certificate:", e);
+      console.error("Failed to fetch or decode certificate:", e);
       return null;
     }
   }
