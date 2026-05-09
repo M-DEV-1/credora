@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Get the repository root directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT" || exit 1
+
+# Web build check
+if git diff --cached --name-only | grep -q '^web/'; then
+    echo "🔍 Web changes detected. Running build check..."
+    
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "❌ Error: npm not found. Please install Node.js to check web builds."
+        exit 1
+    fi
+
+    if ! (cd web && npm run build); then
+        echo "❌ Web build failed. Commit aborted."
+        exit 1
+    fi
+    echo "✅ Web build successful."
+fi
+
+# Contract build check
+if git diff --cached --name-only | grep -q '^contracts/'; then
+    echo "🔍 Contract changes detected. Running build check..."
+    
+    # Check for WSL (common for Windows Solana dev)
+    if command -v wsl.exe >/dev/null 2>&1 || command -v wsl >/dev/null 2>&1; then
+        echo "🐳 Running build in WSL..."
+        if ! wsl bash -l -c "cd contracts && cargo build-sbf"; then
+            echo "❌ Contract build failed in WSL. Commit aborted."
+            exit 1
+        fi
+    else
+        echo "🛠️ Running native build..."
+        if ! command -v cargo >/dev/null 2>&1; then
+            echo "❌ Error: cargo not found. Please install Rust/Solana tools to check contract builds."
+            exit 1
+        fi
+        
+        if ! (cd contracts && cargo build-sbf); then
+            echo "❌ Contract build failed. Commit aborted."
+            exit 1
+        fi
+    fi
+    echo "✅ Contract build successful."
+fi
+
+exit 0
