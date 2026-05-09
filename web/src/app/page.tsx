@@ -2,7 +2,13 @@
 
 import { Navbar } from "@/components/layouts/Navbar";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShieldCheck, FileCheck2, Landmark, History } from "lucide-react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  FileCheck2,
+  Landmark,
+  History,
+} from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -11,9 +17,8 @@ export default function Home() {
     <main className="flex min-h-screen flex-col overflow-hidden relative">
       <Navbar />
 
-      {/* Hero Section - Institutional Grade */}
       <section className="relative flex flex-1 flex-col items-center justify-center px-4 pt-32 pb-20 text-center sm:px-6 lg:px-8 z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -21,20 +26,21 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-widest mb-8">
             <ShieldCheck className="w-3.5 h-3.5 text-slate-800" />
-            Institutional Grade Security
+            You can trust me with your certificates.
           </div>
-          
+
           <h1 className="text-6xl font-serif font-medium tracking-tight sm:text-8xl text-slate-900 leading-[1.1]">
             The Standard for <br />
             <span className="text-[#B8860B]">Digital Credentials</span>
           </h1>
-          
+
           <p className="mx-auto mt-8 max-w-2xl text-lg sm:text-xl font-light leading-relaxed text-slate-600">
-            Secure, immutable, and cryptographically verifiable academic and professional 
-            records anchored on the Solana blockchain. Engineered for the modern institution.
+            Secure, immutable, and cryptographically verifiable academic and
+            professional records anchored on the Solana blockchain. Engineered
+            for the modern institution.
           </p>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -108,20 +114,38 @@ export default function Home() {
       <footer className="mt-auto border-t border-slate-200/60 py-12 px-4 sm:px-6 lg:px-8 bg-white relative z-20">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#002147] rounded flex items-center justify-center text-white font-serif font-bold text-lg">C</div>
-            <span className="text-sm font-bold tracking-tighter text-slate-900 uppercase">Credora</span>
+            <div className="w-8 h-8 bg-[#002147] rounded flex items-center justify-center text-white font-serif font-bold text-lg">
+              C
+            </div>
+            <span className="text-sm font-bold tracking-tighter text-slate-900 uppercase">
+              Credora
+            </span>
           </div>
           <div className="text-xs font-medium text-slate-400">
             © 2026 Credora Systems. All Rights Reserved.
           </div>
           <div className="flex gap-8 text-xs font-bold text-slate-600 uppercase tracking-widest">
-            <Link href="https://x.com/mdev_1" className="hover:text-[#B8860B] transition-colors">Network</Link>
-            <Link href="https://github.com/M-DEV-1/credora" className="hover:text-[#B8860B] transition-colors">Repository</Link>
-            <Link href="/docs" className="hover:text-[#B8860B] transition-colors">Documentation</Link>
+            <Link
+              href="https://x.com/mdev_1"
+              className="hover:text-[#B8860B] transition-colors"
+            >
+              Network
+            </Link>
+            <Link
+              href="https://github.com/M-DEV-1/credora"
+              className="hover:text-[#B8860B] transition-colors"
+            >
+              Repository
+            </Link>
+            <Link
+              href="/docs"
+              className="hover:text-[#B8860B] transition-colors"
+            >
+              Documentation
+            </Link>
           </div>
         </div>
       </footer>
     </main>
   );
 }
-

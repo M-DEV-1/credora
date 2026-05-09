@@ -6,12 +6,15 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+});
 
 export const metadata: Metadata = {
   title: "Credora | Institutional Credential Verification",
   description:
-    "Secure, immutable, and institutional-grade certificate verification powered by Solana.",
+    "Secure, immutable, and institutional certificate verification powered by Solana.",
 };
 
 export default function RootLayout({
@@ -20,7 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${playfair.variable}`}
+    >
       <body
         className={cn(
           "min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 font-sans relative",
