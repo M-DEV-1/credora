@@ -7,60 +7,65 @@ import { Navbar } from "@/components/layouts/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, ShieldAlert, Calendar, User, Mail, FileText, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type VerifyStep = "searching" | "fetching" | "decrypting" | "ready";
 
+type VerifyState = {
+  step: VerifyStep;
+  certificate: any | null;
+  error: string | null;
+};
+
 function VerifyContent() {
   const params = useParams();
   const address = params.address as string;
   
-  const [step, setStep] = React.useState<VerifyStep>("searching");
-  const [certificate, setCertificate] = React.useState<any>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [state, setState] = React.useState<VerifyState>({
+    step: "searching",
+    certificate: null,
+    error: null,
+  });
 
   React.useEffect(() => {
     async function fetchCert() {
       if (!address) return;
       try {
         // 1. Search Chain
-        setStep("searching");
         const onChain = await solanaClient.getCertificate(address);
         if (!onChain) {
-          setError("No certificate found at this address.");
+          setState({ step: "searching", certificate: null, error: "No certificate found at this address." });
           return;
         }
 
-        // 2. Fetch Database Metadata (to get real IPFS CID)
-        setStep("decrypting");
-        const privateResponse = await fetch(`/api/certificates/${onChain.cid}`);
-        const privateMetadata = privateResponse.ok ? await privateResponse.json() : {};
-        
-        const realCid = privateMetadata.ipfsCid || onChain.cid;
-
-        // 3. Fetch IPFS Public Metadata
-        setStep("fetching");
-        const ipfsUrl = `/api/ipfs?cid=${realCid}`;
+        // 2. Fetch IPFS
+        setState(prev => ({ ...prev, step: "fetching" }));
+        const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${onChain.cid}`;
         const publicMetaResponse = await fetch(ipfsUrl);
         if (!publicMetaResponse.ok) throw new Error("Failed to fetch public metadata.");
         const publicMetadata = await publicMetaResponse.json();
 
-        setCertificate({ 
-          onChain, 
-          metadata: { ...publicMetadata, ...privateMetadata } 
+        // 3. Decrypt Private
+        setState(prev => ({ ...prev, step: "decrypting" }));
+        const privateResponse = await fetch(`/api/certificates/${onChain.cid}`);
+        const privateMetadata = privateResponse.ok ? await privateResponse.json() : {};
+
+        setState({ 
+          step: "ready",
+          certificate: { onChain, metadata: { ...publicMetadata, ...privateMetadata } },
+          error: null
         });
-        setStep("ready");
       } catch (e: any) {
         console.error("Verification failed:", e);
-        setError(e.message || "An unexpected error occurred during verification.");
+        setState({ step: "ready", certificate: null, error: e.message || "An unexpected error occurred." });
       }
     }
     fetchCert();
   }, [address]);
 
-  if (error) {
+  if (state.error) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-20 text-center space-y-6">
         <div className="p-4 rounded-full bg-red-50">
@@ -68,14 +73,14 @@ function VerifyContent() {
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-neutral-900">Verification Error</h1>
-          <p className="text-neutral-500 max-w-md mx-auto font-medium">{error}</p>
+          <p className="text-neutral-500 max-w-md mx-auto font-medium">{state.error}</p>
         </div>
         <Button variant="outline" onClick={() => window.location.reload()}>Try Again</Button>
       </div>
     );
   }
 
-  if (step !== "ready") {
+  if (state.step !== "ready") {
     const stepLabels = {
       searching: "Searching Solana Blockchain...",
       fetching: "Retrieving IPFS Metadata...",
@@ -89,14 +94,14 @@ function VerifyContent() {
       <div className="flex flex-col items-center justify-center py-20 space-y-8 w-full">
         <div className="w-full max-w-md space-y-4">
           <div className="flex justify-between items-end">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">{stepLabels[step]}</h3>
-            <span className="text-xs font-mono text-neutral-400 font-bold">{stepProgress[step]}%</span>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">{stepLabels[state.step]}</h3>
+            <span className="text-xs font-mono text-neutral-400 font-bold">{stepProgress[state.step]}%</span>
           </div>
           <div className="h-2 w-full bg-neutral-100 rounded-full overflow-hidden border border-neutral-200">
-            <motion.div 
+            <m.div 
               className="h-full bg-primary" 
               initial={{ width: 0 }}
-              animate={{ width: `${stepProgress[step]}%` }}
+              animate={{ width: `${stepProgress[state.step]}%` }}
             />
           </div>
         </div>
@@ -108,10 +113,11 @@ function VerifyContent() {
     );
   }
 
+  const certificate = state.certificate;
   const isRevoked = certificate.onChain.status !== 0;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
@@ -123,7 +129,7 @@ function VerifyContent() {
         )} />
         <CardHeader className="text-center pb-8 pt-10">
           <div className="flex justify-center mb-6">
-            <motion.div 
+            <m.div 
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className={cn(
@@ -136,7 +142,7 @@ function VerifyContent() {
               ) : (
                 <ShieldCheck className="h-14 w-14 text-emerald-500" />
               )}
-            </motion.div>
+            </m.div>
           </div>
           <div className="space-y-3">
             <Badge 
@@ -222,7 +228,7 @@ function VerifyContent() {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   );
 }
 
