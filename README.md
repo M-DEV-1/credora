@@ -1,13 +1,14 @@
 # Credora
 
+[![React Doctor](https://www.react.doctor/share/badge?p=credora&s=85&e=1&w=299&f=217)](https://www.react.doctor/share?p=credora&s=85&e=1&w=299&f=217)
+
 ![Credora Preview](./public/image.png)
 
 Credora is an institutional platform for issuing, managing, and verifying digital credentials securely on the Solana blockchain. It combines the immutability of decentralized ledgers with off-chain IPFS storage to provide tamper-proof academic and professional records.
 
 ## Demo
+
 https://github.com/user-attachments/assets/e44f85cd-16bd-41db-950c-64a27035a1a9
-
-
 
 ## Features
 
